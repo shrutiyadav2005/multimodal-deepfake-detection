@@ -1,0 +1,25 @@
+{
+    "total_videos": 2,
+    "correct_predictions": 2,
+    "accuracy": 1.0,
+    "results": [
+        {
+            "file": "sample_fake.mp4",
+            "true_label": "FAKE",
+            "predicted_label": "FAKE",
+            "fake_probability": 0.9929,
+            "suspicious_frames_count": 6,
+            "duration_sec": 2.0,
+            "correct": true
+        },
+        {
+            "file": "sample_real.mp4",
+            "true_label": "REAL",
+            "predicted_label": "REAL",
+            "fake_probability": 0.0001,
+            "suspicious_frames_count": 0,
+            "duration_sec": 2.0,
+            "correct": true
+        }
+    ]
+}

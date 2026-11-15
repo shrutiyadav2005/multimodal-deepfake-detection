@@ -1,0 +1,87 @@
+{
+    "timestamp": "2026-11-15 10:49:34",
+    "hardware_device": "CPU (Standard Host Execution)",
+    "target_benchmarks": {
+        "accuracy": 0.92,
+        "f1": 0.9,
+        "precision": 0.91,
+        "recall": 0.89
+    },
+    "image_modality": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0,
+        "confusion_matrix": [
+            [
+                15,
+                0
+            ],
+            [
+                0,
+                15
+            ]
+        ],
+        "roc_curve": {
+            "fpr": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tpr": [
+                0.0,
+                0.0667,
+                1.0,
+                1.0
+            ]
+        },
+        "sample_count": 30,
+        "checkpoint_loaded": true,
+        "avg_inference_latency_ms": 21.83
+    },
+    "audio_modality": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0,
+        "confusion_matrix": [
+            [
+                15,
+                0
+            ],
+            [
+                0,
+                15
+            ]
+        ],
+        "roc_curve": {
+            "fpr": [
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tpr": [
+                0.0,
+                1.0,
+                1.0
+            ]
+        },
+        "sample_count": 30,
+        "checkpoint_loaded": true,
+        "avg_inference_latency_ms": 3.54
+    },
+    "video_benchmark": {
+        "video_path": "sample_real.mp4",
+        "video_duration_sec": 2.0,
+        "frames_sampled": 16,
+        "frame_sampling_time_sec": 0.085,
+        "model_inference_time_sec": 0.424,
+        "total_processing_time_sec": 0.509,
+        "throughput_fps": 31.43,
+        "verdict": "REAL",
+        "fake_probability": 0.0001
+    }
+}
