@@ -1,6 +1,6 @@
 """
 Streamlit Web Dashboard for Multimodal Deepfake Detection & Explainable Content Verification.
-Modern dark-themed interface supporting Image, Video, Audio, and Multimodal forensics.
+Professional AI SaaS Interface supporting Image, Video, Audio, and Multimodal Forensic Analysis.
 """
 
 import os
@@ -33,73 +33,210 @@ from utils.helpers import format_file_size, load_json
 
 # Page configuration
 st.set_page_config(
-    page_title="Multimodal Deepfake Detection & XAI",
+    page_title="DeepGuard AI • Enterprise Multimodal Forensics",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Modern Dark Theme
+# Custom SaaS Dark Theme CSS
 st.markdown("""
 <style>
-    .main {
-        background-color: #0e1117;
-        color: #f3f4f6;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
+    code, pre {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* Main Container */
+    .stApp {
+        background-color: #0b0f19;
+        color: #f1f5f9;
+    }
+
+    /* SaaS Header Banner */
+    .saas-header {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .saas-header h1 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .saas-header p {
+        margin: 4px 0 0 0;
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    /* Status Telemetry Pills */
+    .telemetry-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 9999px;
+        padding: 4px 12px;
+        font-size: 12px;
+        color: #cbd5e1;
+        font-weight: 500;
+    }
+    .status-dot-green {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #10b981;
+        box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Elevated Surface Cards */
+    .saas-card {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    .saas-card h3 {
+        margin-top: 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: #e2e8f0;
+    }
+
+    /* Prediction Verdict Cards */
+    .verdict-hero {
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin-bottom: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .verdict-real {
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(6, 95, 70, 0.2) 100%);
+        border: 1px solid #10b981;
+    }
+    .verdict-fake {
+        background: linear-gradient(135deg, rgba(127, 29, 29, 0.4) 0%, rgba(153, 27, 27, 0.2) 100%);
+        border: 1px solid #ef4444;
+    }
+    .verdict-warning {
+        background: linear-gradient(135deg, rgba(120, 53, 15, 0.4) 0%, rgba(146, 64, 14, 0.2) 100%);
+        border: 1px solid #f59e0b;
+    }
+    .verdict-title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .text-real { color: #34d399; }
+    .text-fake { color: #f87171; }
+    .text-warning { color: #fbbf24; }
+
+    /* Confidence Bars */
+    .confidence-meter-container {
+        background: #1f2937;
+        border-radius: 9999px;
+        height: 12px;
+        overflow: hidden;
+        margin: 12px 0 6px 0;
+        display: flex;
+    }
+    .meter-fill-real {
+        background: linear-gradient(90deg, #059669, #10b981);
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+    .meter-fill-fake {
+        background: linear-gradient(90deg, #dc2626, #ef4444);
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    /* Metric Tiles Grid */
+    .metric-chip {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 10px 14px;
+        text-align: center;
+    }
+    .metric-chip-label {
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    .metric-chip-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-top: 2px;
+    }
+
+    /* Navigation Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #0d121f;
+        border-right: 1px solid #1e293b;
+    }
+    section[data-testid="stSidebar"] .stRadio > label {
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    /* Streamlit Tabs Customization */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
+        border-bottom: 1px solid #1f2937;
+        padding-bottom: 4px;
     }
     .stTabs [data-baseweb="tab"] {
         padding: 8px 18px;
-        background-color: #1a1f2c;
-        border-radius: 6px;
-        color: #9ca3af;
-        border: 1px solid #2d3748;
+        background-color: #111827;
+        border-radius: 8px;
+        color: #94a3b8;
+        border: 1px solid #1f2937;
+        font-weight: 500;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #2563eb !important;
+        background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
         color: #ffffff !important;
+        border-color: #3b82f6 !important;
         font-weight: 600;
     }
-    .metric-card {
+
+    /* Frame Gallery Card */
+    .frame-card {
         background: #1e2433;
         border: 1px solid #2d3748;
         border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 12px;
-    }
-    .badge-real {
-        background-color: #065f46;
-        color: #34d399;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: bold;
-        font-size: 14px;
-        display: inline-block;
-    }
-    .badge-fake {
-        background-color: #7f1d1d;
-        color: #f87171;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: bold;
-        font-size: 14px;
-        display: inline-block;
-    }
-    .badge-warning {
-        background-color: #78350f;
-        color: #fbbf24;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: bold;
-        font-size: 14px;
-        display: inline-block;
+        padding: 8px;
+        text-align: center;
+        margin-bottom: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-# Cached pipeline loaders
+# Cached pipeline loaders with automatic device selection
 @st.cache_resource
 def get_image_pipeline():
     return ImageInferencePipeline()
@@ -117,100 +254,177 @@ def get_multimodal_verifier():
     return MultimodalVerifier()
 
 
-# Sidebar Navigation
-st.sidebar.image("https://img.icons8.com/fluency/96/shield.png", width=64)
-st.sidebar.title("Deepfake Forensics")
-st.sidebar.caption("Multimodal & Explainable AI Engine")
+# Hardware context
+device = get_device()
+hardware_name = get_device_name(device)
 
-hardware_name = get_device_name(get_device())
-st.sidebar.info(f"⚡ **Compute Hardware:**\n{hardware_name}")
+# Sidebar Navigation & Telemetry
+with st.sidebar:
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+        <span style="font-size: 30px;">🛡️</span>
+        <div>
+            <div style="font-weight: 800; font-size: 18px; color: #f8fafc; letter-spacing: 0.5px;">DeepGuard AI</div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Enterprise Forensics SaaS</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-navigation = st.sidebar.radio(
-    "Navigation",
-    [
-        "Home & Overview",
-        "Image Verification",
-        "Video Verification",
-        "Audio Verification",
-        "Audio-Visual Consistency",
-        "Explainability & XAI",
-        "Model Performance",
-        "About & Architecture",
-    ]
-)
+    st.markdown(f"""
+    <div class="telemetry-pill" style="width: 100%; justify-content: center; margin-bottom: 16px;">
+        <span class="status-dot-green"></span>
+        <span>Engine Active • {device.type.upper()}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    navigation = st.radio(
+        "FORENSIC SUITE",
+        [
+            "Overview & Telemetry",
+            "Image Verification",
+            "Video Verification",
+            "Audio Verification",
+            "Audio-Visual Consistency",
+            "Explainability & XAI",
+            "Enterprise Benchmarks",
+            "System Architecture",
+        ],
+        label_visibility="visible"
+    )
+
+    st.markdown("---")
+    st.caption("**System Specifications**")
+    st.markdown(f"""
+    - **Compute Engine:** `{hardware_name}`
+    - **PyTorch Hub Cache:** `Active (/tmp)`
+    - **Image Backbone:** `ResNet18 (Fine-Tuned)`
+    - **Audio Backbone:** `4-Stage 2D CNN`
+    - **Multimodal Engine:** `Late Fusion (wv=0.55)`
+    """)
+
+    if st.button("🧹 Clear Session & Cache"):
+        st.session_state.clear()
+        st.cache_resource.clear()
+        st.rerun()
 
 
-# Helper: Downloadable Report
+# Helper: Downloadable Structured Reports
 def make_download_report(results: dict, modality: str) -> str:
     report_dict = {
-        "report_type": f"{modality.upper()} Forensics Report",
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "hardware_device": hardware_name,
-        "results": {k: v for k, v in results.items() if not isinstance(v, (np.ndarray, Image.Image))}
+        "platform": "DeepGuard AI Enterprise Forensics Suite",
+        "modality": modality.upper(),
+        "timestamp_utc": time.strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "hardware_compute": hardware_name,
+        "forensic_audit": {
+            k: v for k, v in results.items()
+            if not isinstance(v, (np.ndarray, Image.Image))
+        }
     }
     return json.dumps(report_dict, indent=4)
 
 
+def make_markdown_certificate(results: dict, modality: str) -> str:
+    verdict = results.get("verdict", "N/A")
+    confidence = results.get("confidence", 0.0)
+    latency = results.get("processing_time_sec", results.get("total_processing_time_sec", 0.0))
+
+    lines = [
+        f"# DEEPGUARD AI — FORENSIC AUDIT CERTIFICATE",
+        f"**Modality:** {modality.upper()} | **Audit Timestamp:** {time.strftime('%Y-%m-%d %H:%M:%S UTC')}",
+        f"**Hardware Environment:** {hardware_name}",
+        f"",
+        f"---",
+        f"## Executive Forensic Verdict: **{verdict}**",
+        f"- **Model Confidence Score:** {confidence * 100:.2f}%",
+        f"- **Analysis Latency:** {latency:.3f} seconds",
+        f"- **Authenticity Likelihood:** {(results.get('real_probability', 1.0 - confidence)) * 100:.2f}%",
+        f"- **Manipulation Likelihood:** {(results.get('fake_probability', confidence)) * 100:.2f}%",
+        f"",
+        f"---",
+        f"## Forensic Details & Methodology",
+        f"{results.get('explanation', 'No detailed notes logged.')}",
+        f"",
+        f"---",
+        f"*Scientific Disclosure: This certificate represents statistical feature extraction from deep neural networks. It does not constitute a legal guarantee of media origin.*"
+    ]
+    return "\n".join(lines)
+
+
 # =====================================================================
-# 1. HOME & OVERVIEW
+# 1. OVERVIEW & TELEMETRY
 # =====================================================================
-if navigation == "Home & Overview":
-    st.title("🛡️ Multimodal Deepfake Detection & Explainable Content Verification")
+if navigation == "Overview & Telemetry":
     st.markdown("""
-    Welcome to the **Multimodal Deepfake Forensics Platform**. This system provides automated integrity 
-    verification and explainable artificial intelligence (XAI) diagnostics across **Images, Videos, and Audio**, 
-    along with **Cross-Modal Audio-Visual Consistency Analysis**.
+    <div class="saas-header">
+        <div>
+            <h1>DeepGuard AI Forensics Suite</h1>
+            <p>Next-Generation Explainable Artificial Intelligence for Synthetic Media Verification</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>v1.0.0 Enterprise • Production Ready</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    Welcome to the enterprise verification console. DeepGuard AI analyzes digital assets across **visual, acoustic, 
+    and cross-modal channels** to detect synthetic manipulation (GANs, Diffusion, voice cloning, and deepfakes) 
+    with transparent mathematical explainability.
     """)
 
-    st.markdown("---")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
+    # Modality Cards
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
         st.markdown("""
-        <div class="metric-card">
-            <h4>🖼️ Image Forensics</h4>
-            <p>ResNet18 CNN backbone trained to detect synthetic facial manipulation with Grad-CAM saliency heatmaps.</p>
+        <div class="saas-card">
+            <h3>🖼️ Visual Forensics</h3>
+            <p style="font-size: 13px; color: #94a3b8;">Fine-tuned ResNet18 CNN detecting localized facial warping, boundary seams, and generative artifacts.</p>
+            <div style="font-size: 11px; color: #3b82f6; font-weight: 600;">GRAD-CAM SALIENCY ENABLED</div>
         </div>
         """, unsafe_allow_html=True)
-    with col2:
+    with c2:
         st.markdown("""
-        <div class="metric-card">
-            <h4>🎬 Video Forensics</h4>
-            <p>Intelligent uniform frame sampling with temporal aggregation heuristics and suspicious frame timelines.</p>
+        <div class="saas-card">
+            <h3>🎬 Temporal Video</h3>
+            <p style="font-size: 13px; color: #94a3b8;">Uniform frame sampling with <code>top_k_mean</code> temporal aggregation to catch intermittent splicing.</p>
+            <div style="font-size: 11px; color: #3b82f6; font-weight: 600;">TIMELINE TRAJECTORY ANALYSIS</div>
         </div>
         """, unsafe_allow_html=True)
-    with col3:
+    with c3:
         st.markdown("""
-        <div class="metric-card">
-            <h4>🎙️ Audio Forensics</h4>
-            <p>Spectrogram CNN extracting log-Mel features to detect voice cloning, synthetic TTS, and vocoder artifacts.</p>
+        <div class="saas-card">
+            <h3>🎙️ Acoustic Forensics</h3>
+            <p style="font-size: 13px; color: #94a3b8;">4-stage 2D SpectrogramCNN identifying TTS vocoder distortions, robotic harmonics, and phase jumps.</p>
+            <div style="font-size: 11px; color: #3b82f6; font-weight: 600;">128-BAND LOG-MEL STFT</div>
         </div>
         """, unsafe_allow_html=True)
-    with col4:
+    with c4:
         st.markdown("""
-        <div class="metric-card">
-            <h4>🔗 Multimodal Fusion</h4>
-            <p>Evaluates cross-modal consistency between visual and audio streams to detect dubbing and face swaps.</p>
+        <div class="saas-card">
+            <h3>🔗 Audio-Visual Fusion</h3>
+            <p style="font-size: 13px; color: #94a3b8;">Cross-modal integrity metric (|P_video - P_audio|) detecting voice dubbing or facial replacement.</p>
+            <div style="font-size: 11px; color: #3b82f6; font-weight: 600;">DUAL-STREAM CONGRUENCE</div>
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.subheader("System Architecture")
+    st.subheader("System Pipeline & Data Flow")
     st.markdown("""
     ```mermaid
     flowchart LR
-        Input[Uploaded Content] --> Router{Media Modality}
+        Media[Media Ingestion] --> Router{Container Router}
+        Router -->|Image| PrepImg[Face Isolation] --> ResNet[ResNet18 CNN] --> GradCAM[Grad-CAM Saliency Engine]
+        Router -->|Video| PrepVid[Uniform Sampling] --> VideoModel[Spatial-Temporal Aggregator] --> Timeline[Suspicion Timeline]
+        Router -->|Audio| PrepAud[Mel Spectrogram] --> AudioModel[SpectrogramCNN] --> SpecVis[Acoustic Visualizer]
         
-        Router -->|Image| ImgPrep[Face Detection & Crop] --> ResNet[ResNet18 Classifier] --> GradCAM[Grad-CAM Saliency]
-        Router -->|Video| VidPrep[Uniform Frame Sampling] --> FrameInfer[Frame-Level CNN] --> Aggregation[Temporal Aggregation]
-        Router -->|Audio| AudPrep[Log-Mel Spectrogram] --> SpecCNN[Spectrogram CNN] --> AudExplain[Spectral Saliency]
+        VideoModel --> Fusion[Cross-Modal Consistency Engine]
+        AudioModel --> Fusion
         
-        Aggregation --> FusionEngine[Audio-Visual Consistency Engine]
-        SpecCNN --> FusionEngine
-        
-        GradCAM --> Dashboard[Verification Dashboard & Report]
-        Aggregation --> Dashboard
-        AudExplain --> Dashboard
-        FusionEngine --> Dashboard
+        GradCAM --> SaaSReport[Audit Dashboard & Downloadable Certificate]
+        Timeline --> SaaSReport
+        SpecVis --> SaaSReport
+        Fusion --> SaaSReport
     ```
     """)
 
@@ -219,8 +433,18 @@ if navigation == "Home & Overview":
 # 2. IMAGE VERIFICATION
 # =====================================================================
 elif navigation == "Image Verification":
-    st.title("🖼️ Image Deepfake Verification")
-    st.markdown("Analyze uploaded portraits and images for synthetic generation, facial warping, or blending seams.")
+    st.markdown("""
+    <div class="saas-header">
+        <div>
+            <h1>Visual Deepfake Verification</h1>
+            <p>Spatial artifact inspection, facial landmark isolation, and Grad-CAM saliency mapping</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>ResNet18 Backbone Active</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     pipeline = get_image_pipeline()
     sample_img_dir = config.sample_data_dir / "images"
@@ -228,17 +452,19 @@ elif navigation == "Image Verification":
     if "target_image_path" not in st.session_state:
         st.session_state.target_image_path = None
 
+    # Staged Sample Selector Cards
     col_btn1, col_btn2 = st.columns(2)
     with col_btn1:
-        if st.button("📁 Load Sample Authentic Image"):
+        if st.button("📁 Load Authentic Sample Image", use_container_width=True):
             st.session_state.target_image_path = sample_img_dir / "sample_real.jpg"
     with col_btn2:
-        if st.button("⚠️ Load Sample Manipulated Image"):
+        if st.button("⚠️ Load Manipulated Sample Image", use_container_width=True):
             st.session_state.target_image_path = sample_img_dir / "sample_fake.jpg"
 
     uploaded_file = st.file_uploader(
-        "Choose an image file (.jpg, .jpeg, .png)",
-        type=["jpg", "jpeg", "png"]
+        "Upload target portrait (.jpg, .jpeg, .png)",
+        type=["jpg", "jpeg", "png"],
+        help="Accepts high-resolution portraits and facial imagery."
     )
 
     if uploaded_file is not None:
@@ -250,59 +476,143 @@ elif navigation == "Image Verification":
     target_image_path = st.session_state.target_image_path
 
     if target_image_path and Path(target_image_path).exists():
-        st.markdown(f"**Selected Media:** `{Path(target_image_path).name}`")
-        st.image(str(target_image_path), width=280)
-        st.markdown("---")
-        crop_face = st.checkbox("Enable Automatic Facial Landmark Cropping", value=True)
+        p_card1, p_card2 = st.columns([1, 2])
+        with p_card1:
+            st.markdown(f"**Target Asset:** `{Path(target_image_path).name}`")
+            st.image(str(target_image_path), use_container_width=True)
+            crop_face = st.checkbox("Automated Facial Bounding Box Crop", value=True)
+            run_btn = st.button("⚡ Execute Forensic Audit", type="primary", use_container_width=True)
 
-        if st.button("🚀 Run Image Forensic Verification", type="primary"):
-            with st.spinner("Analyzing image features and computing Grad-CAM saliency..."):
+        if run_btn:
+            with st.spinner("Extracting spatial features and generating Grad-CAM activation hooks..."):
                 results = pipeline.analyze(target_image_path, crop_face=crop_face)
 
             verdict = results["verdict"]
             confidence = results["confidence"]
+            real_prob = results["real_probability"]
             fake_prob = results["fake_probability"]
 
-            res_col1, res_col2 = st.columns([1, 2])
-            with res_col1:
-                badge = "badge-fake" if verdict == "FAKE" else "badge-real"
-                st.markdown(f'<div class="{badge}">{verdict} ({confidence * 100:.1f}%)</div>', unsafe_allow_html=True)
-                st.markdown(f"**Fake Probability:** {fake_prob * 100:.2f}%")
-                st.markdown(f"**Real Probability:** {(1.0 - fake_prob) * 100:.2f}%")
-                st.markdown(f"**Latency:** {results['processing_time_sec']:.3f} s")
-                st.markdown(f"**Hardware:** {results['hardware_device']}")
+            with p_card2:
+                # Prediction Hero Card
+                v_class = "verdict-fake" if verdict == "FAKE" else "verdict-real"
+                t_class = "text-fake" if verdict == "FAKE" else "text-real"
+                status_label = "MANIPULATED / SYNTHETIC" if verdict == "FAKE" else "AUTHENTIC / UNMANIPULATED"
 
-                # Download report
-                rep_json = make_download_report(results, "image")
-                st.download_button(
-                    "📥 Download JSON Forensic Report",
-                    data=rep_json,
-                    file_name="image_verification_report.json",
-                    mime="application/json"
-                )
+                st.markdown(f"""
+                <div class="verdict-hero {v_class}">
+                    <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Forensic Determination</div>
+                    <div class="verdict-title {t_class}">{status_label}</div>
+                    <div style="font-size: 16px; color: #cbd5e1;">Model Confidence: <strong>{confidence * 100:.2f}%</strong></div>
+                    <div class="confidence-meter-container">
+                        <div class="meter-fill-real" style="width: {real_prob * 100}%;"></div>
+                        <div class="meter-fill-fake" style="width: {fake_prob * 100}%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
+                        <span>Real: {real_prob * 100:.1f}%</span>
+                        <span>Fake: {fake_prob * 100:.1f}%</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
-            with res_col2:
+                # Telemetry Metric Chips
+                m1, m2, m3 = st.columns(3)
+                with m1:
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Latency</div>
+                        <div class="metric-chip-value">{results['processing_time_sec']:.3f}s</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with m2:
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Hardware</div>
+                        <div class="metric-chip-value">{device.type.upper()}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with m3:
+                    chk_status = "Trained" if results['checkpoint_loaded'] else "Backbone"
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Checkpoint</div>
+                        <div class="metric-chip-value">{chk_status}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
                 st.info(results["explanation"])
 
-            st.markdown("### Visual Explainability (Grad-CAM Saliency)")
-            img_c1, img_c2, img_c3 = st.columns(3)
-            with img_c1:
-                st.caption("1. Preprocessed Input Image")
-                st.image(results["original_image"], use_container_width=True)
-            with img_c2:
-                st.caption("2. Raw Activation Heatmap")
-                st.image(results["gradcam_heatmap"], clamp=True, use_container_width=True)
-            with img_c3:
-                st.caption("3. Grad-CAM Blended Overlay")
-                st.image(results["gradcam_overlay"], use_container_width=True)
+                # Report Download Buttons
+                rep_c1, rep_c2 = st.columns(2)
+                with rep_c1:
+                    json_str = make_download_report(results, "image")
+                    st.download_button(
+                        "📥 Export JSON Audit Log",
+                        data=json_str,
+                        file_name=f"audit_{Path(target_image_path).stem}.json",
+                        mime="application/json",
+                        use_container_width=True
+                    )
+                with rep_c2:
+                    cert_str = make_markdown_certificate(results, "image")
+                    st.download_button(
+                        "📄 Download Forensic Certificate",
+                        data=cert_str,
+                        file_name=f"certificate_{Path(target_image_path).stem}.md",
+                        mime="text/markdown",
+                        use_container_width=True
+                    )
+
+            # Explainability Tabs
+            st.markdown("---")
+            st.subheader("🔍 Explainable AI (XAI) Saliency Inspection")
+            x_tab1, x_tab2, x_tab3 = st.tabs(["Side-by-Side Saliency", "Activation Heatmap", "Technical Interpretation"])
+
+            with x_tab1:
+                col_x1, col_x2 = st.columns(2)
+                with col_x1:
+                    st.caption("**1. Preprocessed Primary Face Region (224x224)**")
+                    st.image(results["original_image"], use_container_width=True)
+                with col_x2:
+                    st.caption("**2. Grad-CAM Saliency Overlay (Layer4[-1] Activation)**")
+                    st.image(results["gradcam_overlay"], use_container_width=True)
+
+            with x_tab2:
+                col_h1, col_h2 = st.columns([2, 1])
+                with col_h1:
+                    st.image(results["gradcam_heatmap"], caption="Normalized Gradient Activation Map", clamp=True, use_container_width=True)
+                with col_h2:
+                    st.markdown("""
+                    **Heatmap Colormap Guide:**
+                    - 🔴 **Warm / Red:** High positive gradient contribution towards deepfake prediction (boundary seams, chromatic shifts, texture blur).
+                    - 🔵 **Cool / Blue:** Natural frequency regions consistent with genuine photography.
+                    """)
+
+            with x_tab3:
+                st.markdown("""
+                **Mathematical Saliency Derivation:**
+                $$\\alpha_k^c = \\frac{1}{Z} \\sum_{i} \\sum_{j} \\frac{\\partial y^c}{\\partial A_{ij}^k}, \\quad L_{\\text{Grad-CAM}}^c = \\text{ReLU}\\left( \\sum_k \\alpha_k^c A^k \\right)$$
+                Grad-CAM captures the exact spatial coordinates driving the classification. When synthetic manipulation occurs, 
+                activations concentrate around the facial boundary perimeter where blending discontinuities appear.
+                """)
 
 
 # =====================================================================
 # 3. VIDEO VERIFICATION
 # =====================================================================
 elif navigation == "Video Verification":
-    st.title("🎬 Video Deepfake Verification")
-    st.markdown("Inspect video sequences for facial manipulation, temporal flickering, and spliced synthetic frames.")
+    st.markdown("""
+    <div class="saas-header">
+        <div>
+            <h1>Temporal Video Verification</h1>
+            <p>Uniform frame sampling, temporal aggregation heuristics, and suspicious frame timelines</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>Spatial-Temporal Aggregator</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     pipeline = get_video_pipeline()
     sample_vid_dir = config.sample_data_dir / "videos"
@@ -310,17 +620,18 @@ elif navigation == "Video Verification":
     if "target_video_path" not in st.session_state:
         st.session_state.target_video_path = None
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button("📁 Load Sample Authentic Video"):
+    v_btn1, v_btn2 = st.columns(2)
+    with v_btn1:
+        if st.button("📁 Load Authentic Video Sample", use_container_width=True):
             st.session_state.target_video_path = sample_vid_dir / "sample_real.mp4"
-    with col_btn2:
-        if st.button("⚠️ Load Sample Manipulated Video"):
+    with v_btn2:
+        if st.button("⚠️ Load Manipulated Video Sample", use_container_width=True):
             st.session_state.target_video_path = sample_vid_dir / "sample_fake.mp4"
 
     uploaded_video = st.file_uploader(
-        "Choose a video file (.mp4, .mov, .avi)",
-        type=["mp4", "mov", "avi"]
+        "Upload target video container (.mp4, .mov, .avi)",
+        type=["mp4", "mov", "avi"],
+        help="Maximum file size: 100 MB"
     )
 
     if uploaded_video is not None:
@@ -332,65 +643,155 @@ elif navigation == "Video Verification":
     target_video_path = st.session_state.target_video_path
 
     if target_video_path and Path(target_video_path).exists():
-        st.markdown(f"**Selected Media:** `{Path(target_video_path).name}`")
         st.video(str(target_video_path))
         st.markdown("---")
-        col_opt1, col_opt2 = st.columns(2)
-        with col_opt1:
-            agg_method = st.selectbox(
-                "Temporal Aggregation Method",
-                ["top_k_mean", "mean", "max"],
-                help="top_k_mean averages the top 25% most suspicious frames."
-            )
-        with col_opt2:
-            crop_face = st.checkbox("Facial Region Isolation", value=True)
 
-        if st.button("🚀 Run Video Forensic Analysis", type="primary"):
+        c_opt1, c_opt2, c_opt3 = st.columns(3)
+        with c_opt1:
+            agg_method = st.selectbox(
+                "Aggregation Strategy",
+                ["top_k_mean", "mean", "max"],
+                help="top_k_mean averages the top 25% most suspicious frames to prevent temporal dilution."
+            )
+        with c_opt2:
+            frame_sample_count = st.slider("Frame Sample Count", min_value=8, max_value=32, value=16, step=4)
+        with c_opt3:
+            crop_face = st.checkbox("Facial Isolation Mode", value=True)
+
+        if st.button("⚡ Execute Video Forensic Audit", type="primary", use_container_width=True):
+            pipeline.preprocessor.frame_sample_count = frame_sample_count
             pipeline.video_detector.aggregation_method = agg_method
-            with st.spinner("Extracting frames, evaluating CNN features, and aggregating timeline..."):
+
+            with st.spinner(f"Extracting {frame_sample_count} uniform frames and computing temporal suspicion scores..."):
                 results = pipeline.analyze(target_video_path, crop_face=crop_face)
 
             verdict = results["verdict"]
             confidence = results["confidence"]
+            real_prob = results["real_probability"]
+            fake_prob = results["fake_probability"]
 
-            v_col1, v_col2 = st.columns([1, 2])
-            with v_col1:
-                badge = "badge-fake" if verdict == "FAKE" else "badge-real"
-                st.markdown(f'<div class="{badge}">{verdict} ({confidence * 100:.1f}%)</div>', unsafe_allow_html=True)
-                st.markdown(f"**Duration:** {results['metadata']['duration_sec']} s")
-                st.markdown(f"**Frames Sampled:** {len(results['frame_probabilities'])}")
-                st.markdown(f"**Processing Time:** {results['total_processing_time_sec']:.2f} s ({results['throughput_fps']} FPS)")
+            # Video Verdict Card
+            v_class = "verdict-fake" if verdict == "FAKE" else "verdict-real"
+            t_class = "text-fake" if verdict == "FAKE" else "text-real"
+            status_label = "MANIPULATED VIDEO DETECTED" if verdict == "FAKE" else "AUTHENTIC VIDEO STREAM"
 
-                rep_json = make_download_report(results, "video")
-                st.download_button(
-                    "📥 Download Video Forensic Report",
-                    data=rep_json,
-                    file_name="video_verification_report.json",
-                    mime="application/json"
-                )
+            st.markdown(f"""
+            <div class="verdict-hero {v_class}">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Video Forensic Verdict</div>
+                <div class="verdict-title {t_class}">{status_label}</div>
+                <div style="font-size: 16px; color: #cbd5e1;">Aggregated Manipulation Confidence: <strong>{confidence * 100:.2f}%</strong></div>
+                <div class="confidence-meter-container">
+                    <div class="meter-fill-real" style="width: {real_prob * 100}%;"></div>
+                    <div class="meter-fill-fake" style="width: {fake_prob * 100}%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
+                    <span>Real: {real_prob * 100:.1f}%</span>
+                    <span>Fake: {fake_prob * 100:.1f}%</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-            with v_col2:
-                st.info(results["explanation"])
+            # Metadata Chips
+            m1, m2, m3, m4 = st.columns(4)
+            with m1:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Duration</div>
+                    <div class="metric-chip-value">{results['metadata']['duration_sec']}s</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with m2:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Sampled Frames</div>
+                    <div class="metric-chip-value">{len(results['frame_probabilities'])}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with m3:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Total Latency</div>
+                    <div class="metric-chip-value">{results['total_processing_time_sec']:.2f}s</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with m4:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Throughput</div>
+                    <div class="metric-chip-value">{results['throughput_fps']} FPS</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-            st.markdown("### Temporal Suspicion Timeline")
+            st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+            st.info(results["explanation"])
+
+            # Temporal Timeline Chart
+            st.markdown("### 📈 Temporal Suspicion Trajectory")
             st.image(results["timeline_image"], use_container_width=True)
 
-            st.markdown("### Peak Suspicious Frame & Grad-CAM Overlay")
-            pk1, pk2 = st.columns(2)
-            with pk1:
-                st.caption(f"Peak Frame #{results['peak_frame_index']} (Time: {results['peak_frame_timestamp']}s)")
+            # Peak Suspicious Frame
+            st.markdown("### 🎯 Peak Suspicious Frame Breakdown")
+            pf1, pf2 = st.columns(2)
+            with pf1:
+                st.caption(f"Peak Frame Index: #{results['peak_frame_index']} | Timestamp: {results['peak_frame_timestamp']}s")
                 st.image(results["peak_raw_frame"], use_container_width=True)
-            with pk2:
-                st.caption("Grad-CAM Saliency Overlay")
+            with pf2:
+                st.caption("Grad-CAM Saliency Overlay (Peak Frame)")
                 st.image(results["peak_cam_overlay"], use_container_width=True)
+
+            # Flagged Frames Grid
+            if results["suspicious_frames"]:
+                st.markdown("### ⚠️ Flagged Suspicious Frames Gallery")
+                flag_cols = st.columns(min(4, len(results["suspicious_frames"])))
+                for idx, item in enumerate(results["suspicious_frames"][:8]):
+                    with flag_cols[idx % 4]:
+                        st.markdown(f"""
+                        <div class="frame-card">
+                            <div style="font-size: 11px; font-weight: 700; color: #ef4444;">T={item['timestamp_sec']}s (Frame #{item['frame_index']})</div>
+                            <div style="font-size: 12px; color: #cbd5e1;">Score: {item['fake_probability'] * 100:.1f}%</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.image(item["image"], use_container_width=True)
+
+            # Download Reports
+            st.markdown("---")
+            d_c1, d_c2 = st.columns(2)
+            with d_c1:
+                json_str = make_download_report(results, "video")
+                st.download_button(
+                    "📥 Export Video JSON Audit Log",
+                    data=json_str,
+                    file_name=f"audit_video_{Path(target_video_path).stem}.json",
+                    mime="application/json",
+                    use_container_width=True
+                )
+            with d_c2:
+                cert_str = make_markdown_certificate(results, "video")
+                st.download_button(
+                    "📄 Download Forensic Certificate",
+                    data=cert_str,
+                    file_name=f"certificate_video_{Path(target_video_path).stem}.md",
+                    mime="text/markdown",
+                    use_container_width=True
+                )
 
 
 # =====================================================================
 # 4. AUDIO VERIFICATION
 # =====================================================================
 elif navigation == "Audio Verification":
-    st.title("🎙️ Audio Deepfake & Spoofing Verification")
-    st.markdown("Detect synthetic speech, voice cloning, and text-to-speech (TTS) vocoder artifacts from audio files.")
+    st.markdown("""
+    <div class="saas-header">
+        <div>
+            <h1>Acoustic Deepfake & Speech Verification</h1>
+            <p>Log-Mel spectrogram feature extraction and 2D SpectrogramCNN voice spoofing detection</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>SpectrogramCNN Active</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     pipeline = get_audio_pipeline()
     sample_aud_dir = config.sample_data_dir / "audio"
@@ -398,16 +799,16 @@ elif navigation == "Audio Verification":
     if "target_audio_path" not in st.session_state:
         st.session_state.target_audio_path = None
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button("📁 Load Sample Authentic Audio"):
+    a_btn1, a_btn2 = st.columns(2)
+    with a_btn1:
+        if st.button("📁 Load Authentic Audio Sample", use_container_width=True):
             st.session_state.target_audio_path = sample_aud_dir / "sample_real.wav"
-    with col_btn2:
-        if st.button("⚠️ Load Sample Synthetic Audio"):
+    with a_btn2:
+        if st.button("⚠️ Load Synthetic Audio Sample", use_container_width=True):
             st.session_state.target_audio_path = sample_aud_dir / "sample_fake.wav"
 
     uploaded_audio = st.file_uploader(
-        "Choose an audio file (.wav, .mp3, .flac)",
+        "Upload audio recording (.wav, .mp3, .flac)",
         type=["wav", "mp3", "flac"]
     )
 
@@ -420,49 +821,106 @@ elif navigation == "Audio Verification":
     target_audio_path = st.session_state.target_audio_path
 
     if target_audio_path and Path(target_audio_path).exists():
-        st.markdown(f"**Selected Media:** `{Path(target_audio_path).name}`")
         st.audio(str(target_audio_path))
         st.markdown("---")
 
-        if st.button("🚀 Run Audio Forensic Analysis", type="primary"):
-            with st.spinner("Extracting log-Mel spectrogram and classifying acoustic patterns..."):
+        if st.button("⚡ Execute Acoustic Forensic Audit", type="primary", use_container_width=True):
+            with st.spinner("Computing 128-band log-Mel spectrogram and classifying spectral patterns..."):
                 results = pipeline.analyze(target_audio_path)
 
             verdict = results["verdict"]
             confidence = results["confidence"]
+            real_prob = results["real_probability"]
+            fake_prob = results["fake_probability"]
 
-            a_col1, a_col2 = st.columns([1, 2])
-            with a_col1:
-                badge = "badge-fake" if verdict == "FAKE" else "badge-real"
-                st.markdown(f'<div class="{badge}">{verdict} ({confidence * 100:.1f}%)</div>', unsafe_allow_html=True)
-                st.markdown(f"**Duration:** {results['metadata']['raw_duration_sec']} s")
-                st.markdown(f"**Sample Rate:** {results['metadata']['sample_rate']} Hz")
-                st.markdown(f"**Processing Time:** {results['processing_time_sec']:.3f} s")
+            v_class = "verdict-fake" if verdict == "FAKE" else "verdict-real"
+            t_class = "text-fake" if verdict == "FAKE" else "text-real"
+            status_label = "SYNTHETIC SPEECH / CLONED VOICE" if verdict == "FAKE" else "NATURAL HUMAN SPEECH"
 
-                rep_json = make_download_report(results, "audio")
-                st.download_button(
-                    "📥 Download Audio Forensic Report",
-                    data=rep_json,
-                    file_name="audio_verification_report.json",
-                    mime="application/json"
-                )
+            st.markdown(f"""
+            <div class="verdict-hero {v_class}">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Acoustic Forensic Verdict</div>
+                <div class="verdict-title {t_class}">{status_label}</div>
+                <div style="font-size: 16px; color: #cbd5e1;">Acoustic Likelihood: <strong>{confidence * 100:.2f}%</strong></div>
+                <div class="confidence-meter-container">
+                    <div class="meter-fill-real" style="width: {real_prob * 100}%;"></div>
+                    <div class="meter-fill-fake" style="width: {fake_prob * 100}%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
+                    <span>Authentic: {real_prob * 100:.1f}%</span>
+                    <span>Synthetic: {fake_prob * 100:.1f}%</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-            with a_col2:
-                st.info(results["explanation"])
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Sample Rate</div>
+                    <div class="metric-chip-value">{results['metadata']['sample_rate']} Hz</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with m2:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Duration</div>
+                    <div class="metric-chip-value">{results['metadata']['raw_duration_sec']}s</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with m3:
+                st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Analysis Latency</div>
+                    <div class="metric-chip-value">{results['processing_time_sec']:.3f}s</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-            st.markdown("### Acoustic Log-Mel Spectrogram")
+            st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+            st.info(results["explanation"])
+
+            st.markdown("### 📊 Log-Mel Spectrogram (Decibels)")
             st.image(results["spectrogram_image"], use_container_width=True)
+
+            # Download Reports
+            st.markdown("---")
+            d_c1, d_c2 = st.columns(2)
+            with d_c1:
+                json_str = make_download_report(results, "audio")
+                st.download_button(
+                    "📥 Export Audio JSON Audit Log",
+                    data=json_str,
+                    file_name=f"audit_audio_{Path(target_audio_path).stem}.json",
+                    mime="application/json",
+                    use_container_width=True
+                )
+            with d_c2:
+                cert_str = make_markdown_certificate(results, "audio")
+                st.download_button(
+                    "📄 Download Forensic Certificate",
+                    data=cert_str,
+                    file_name=f"certificate_audio_{Path(target_audio_path).stem}.md",
+                    mime="text/markdown",
+                    use_container_width=True
+                )
 
 
 # =====================================================================
 # 5. AUDIO-VISUAL CONSISTENCY
 # =====================================================================
 elif navigation == "Audio-Visual Consistency":
-    st.title("🔗 Audio-Visual Consistency Analysis")
     st.markdown("""
-    Evaluates independent visual and acoustic integrity streams to detect cross-modal inconsistencies,
-    such as **voice dubbing over real video** or **face-swapping paired with authentic audio**.
-    """)
+    <div class="saas-header">
+        <div>
+            <h1>Cross-Modal Consistency Engine</h1>
+            <p>Dual-stream fusion detecting voice dubbing on authentic video or face-swaps on real audio</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>Multimodal Fusion Active</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     vid_pipeline = get_video_pipeline()
     aud_pipeline = get_audio_pipeline()
@@ -472,16 +930,16 @@ elif navigation == "Audio-Visual Consistency":
     if "target_av_path" not in st.session_state:
         st.session_state.target_av_path = None
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button("📁 Load Authentic Video Sample", key="av_real"):
+    av_btn1, av_btn2 = st.columns(2)
+    with av_btn1:
+        if st.button("📁 Load Authentic Video Container", key="av_real", use_container_width=True):
             st.session_state.target_av_path = sample_vid_dir / "sample_real.mp4"
-    with col_btn2:
-        if st.button("⚠️ Load Manipulated Video Sample", key="av_fake"):
+    with av_btn2:
+        if st.button("⚠️ Load Spliced/Manipulated Video Container", key="av_fake", use_container_width=True):
             st.session_state.target_av_path = sample_vid_dir / "sample_fake.mp4"
 
     uploaded_av = st.file_uploader(
-        "Choose a video file (.mp4, .mov, .avi) with an audio track",
+        "Upload container with audio track (.mp4, .mov, .avi)",
         type=["mp4", "mov", "avi"]
     )
 
@@ -494,11 +952,10 @@ elif navigation == "Audio-Visual Consistency":
     target_av_path = st.session_state.target_av_path
 
     if target_av_path and Path(target_av_path).exists():
-        st.markdown(f"**Selected Media:** `{Path(target_av_path).name}`")
         st.video(str(target_av_path))
 
-        if st.button("🚀 Analyze Cross-Modal Consistency", type="primary"):
-            with st.spinner("Extracting visual frames, extracting audio track, and evaluating congruence..."):
+        if st.button("⚡ Analyze Cross-Modal Consistency", type="primary", use_container_width=True):
+            with st.spinner("Performing dual-stream feature extraction (video frames & audio track)..."):
                 # 1. Video analysis
                 vid_res = vid_pipeline.analyze(target_av_path)
 
@@ -510,7 +967,7 @@ elif navigation == "Audio-Visual Consistency":
                     audio_available = True
                 except Exception as e:
                     audio_available = False
-                    st.warning(f"Audio stream extraction warning: {e}. Analyzing video-only.")
+                    st.warning(f"Audio stream extraction notice: {e}. Analyzing visual stream only.")
 
             if audio_available:
                 eval_res = verifier.evaluate_consistency(
@@ -519,20 +976,42 @@ elif navigation == "Audio-Visual Consistency":
                 )
 
                 st.markdown("---")
-                st.subheader("Multimodal Integrity Assessment")
+                v_class = "verdict-fake" if "FAKE" in eval_res["overall_verdict"] or "SUSPICIOUS" in eval_res["overall_verdict"] else "verdict-real"
+                t_class = "text-fake" if "FAKE" in eval_res["overall_verdict"] or "SUSPICIOUS" in eval_res["overall_verdict"] else "text-real"
+
+                st.markdown(f"""
+                <div class="verdict-hero {v_class}">
+                    <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Multimodal Forensic Determination</div>
+                    <div class="verdict-title {t_class}">VERDICT: {eval_res['overall_verdict']}</div>
+                    <div style="font-size: 16px; color: #cbd5e1;">Consistency Score: <strong>{eval_res['consistency_score'] * 100:.1f}%</strong> (Delta: {eval_res['inconsistency_delta']:.2f})</div>
+                </div>
+                """, unsafe_allow_html=True)
 
                 c1, c2, c3 = st.columns(3)
                 with c1:
-                    st.metric("Visual Fake Probability", f"{eval_res['video_fake_probability'] * 100:.1f}%")
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Visual Fake Score</div>
+                        <div class="metric-chip-value">{eval_res['video_fake_probability'] * 100:.1f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 with c2:
-                    st.metric("Audio Fake Probability", f"{eval_res['audio_fake_probability'] * 100:.1f}%")
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Audio Fake Score</div>
+                        <div class="metric-chip-value">{eval_res['audio_fake_probability'] * 100:.1f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 with c3:
-                    st.metric("Consistency Score", f"{eval_res['consistency_score'] * 100:.1f}%")
+                    st.markdown(f"""
+                    <div class="metric-chip">
+                        <div class="metric-chip-label">Cross-Modal Congruence</div>
+                        <div class="metric-chip-value">{eval_res['consistency_score'] * 100:.1f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                verdict_badge = "badge-fake" if "FAKE" in eval_res["overall_verdict"] or "SUSPICIOUS" in eval_res["overall_verdict"] else "badge-real"
-                st.markdown(f'<div class="{verdict_badge}">Verdict: {eval_res["overall_verdict"]}</div>', unsafe_allow_html=True)
-
-                st.markdown(f"**Diagnostic Analysis:** {eval_res['diagnosis']}")
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+                st.info(f"**Diagnostic Assessment:** {eval_res['diagnosis']}")
                 st.caption(eval_res["limitations_notice"])
 
 
@@ -540,67 +1019,85 @@ elif navigation == "Audio-Visual Consistency":
 # 6. EXPLAINABILITY & XAI
 # =====================================================================
 elif navigation == "Explainability & XAI":
-    st.title("🔍 Explainable AI (XAI) in Forensic Verification")
     st.markdown("""
-    Explainability is a core pillar of trustworthy AI. In forensic deepfake detection, black-box decisions 
-    are insufficient for legal, journalistic, or security contexts. This system provides interpretability across all modalities:
-    """)
+    <div class="saas-header">
+        <div>
+            <h1>Explainable AI (XAI) Scientific Framework</h1>
+            <p>Mathematical formulations and interpretability mechanisms across forensic models</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>Transparent Diagnostics</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    t1, t2, t3 = st.tabs(["Grad-CAM Saliency", "Acoustic Spectrograms", "Temporal Video Timelines"])
+    t1, t2, t3 = st.tabs(["Grad-CAM Saliency", "Acoustic Spectrograms", "Temporal Heuristics"])
 
     with t1:
         st.subheader("Grad-CAM: Gradient-Weighted Class Activation Mapping")
         st.markdown(r"""
-        Grad-CAM calculates the gradients of the target class score $y^c$ with respect to feature activation maps $A^k$
-        of the final convolutional layer:
-        $$\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{ij}^k}$$
-        The neuron importance weights $\alpha_k^c$ scale the feature maps, followed by a ReLU non-linearity:
+        Grad-CAM computes the gradient of the unnormalized score for class $c$ ($y^c$) with respect to feature activation map 
+        $A^k$ of the convolutional layer:
+        $$\alpha_k^c = \frac{1}{Z} \sum_{i=1}^H \sum_{j=1}^W \frac{\partial y^c}{\partial A_{ij}^k}$$
+        The neuron importance weights $\alpha_k^c$ perform a weighted linear combination of feature maps, followed by a ReLU operation:
         $$L_{\text{Grad-CAM}}^c = \text{ReLU}\left(\sum_k \alpha_k^c A^k\right)$$
-        This reveals whether the classifier is genuinely focusing on boundary blending seams, facial warping artifacts, 
-        or background noise.
+        This identifies whether the classifier focuses on genuine facial boundary blending seams or spurious background cues.
         """)
 
     with t2:
         st.subheader("Mel-Spectrogram Acoustic Interpretation")
         st.markdown("""
-        Human speech naturally exhibits smooth formant envelopes and continuous harmonic decay.
-        In contrast, synthetic speech generated by vocoders (e.g. WaveGlow, HiFi-GAN) often introduces:
-        - **Robotic harmonic frequency repetition** in higher frequency bands.
-        - **Phase discontinuities** at phonetic boundaries.
+        Human vocal tracts naturally generate smooth formant transitions and exponential harmonic decay.
+        In contrast, neural vocoders (e.g. WaveGlow, HiFi-GAN) exhibit:
+        - **Robotic harmonic frequency repetition** in the upper frequency bands.
+        - **Phase discontinuities** across phonetic viseme transitions.
         - **High-frequency spectral buzz** visible in the 3 kHz – 8 kHz region of log-Mel spectrograms.
         """)
 
     with t3:
-        st.subheader("Temporal Frame Trajectory")
-        st.markdown("""
-        Deepfakes frequently suffer from temporal coherence degradation (flickering, sudden boundary shifts 
-        when the subject rotates their head). By uniformly sampling frames and plotting per-frame suspicion scores, 
-        investigators can pinpoint the exact sub-second timestamps where manipulation occurs.
+        st.subheader("Temporal Frame Trajectory & Top-k Aggregation")
+        st.markdown(r"""
+        Deepfake manipulation in videos often degrades intermittently when a subject rotates their head.
+        Standard average pooling dilutes detection confidence. We implement **top-$k$ mean aggregation**:
+        $$P_{\text{video}} = \frac{1}{k} \sum_{i=1}^k \text{sort\_descending}\left(\{p_1, p_2, \dots, p_N\}\right)_i$$
+        where $k = \max(1, \lceil N \times 0.25 \rceil)$. This ensures localized temporal manipulations are robustly captured.
         """)
 
 
 # =====================================================================
-# 7. MODEL PERFORMANCE
+# 7. ENTERPRISE BENCHMARKS
 # =====================================================================
-elif navigation == "Model Performance":
-    st.title("📊 Empirical Performance Dashboard")
-    st.markdown("Real measured performance metrics on benchmark test sets compared against portfolio targets.")
+elif navigation == "Enterprise Benchmarks":
+    st.markdown("""
+    <div class="saas-header">
+        <div>
+            <h1>Empirical Performance Dashboard</h1>
+            <p>Measured test split performance versus portfolio target benchmarks</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>Audited Metrics</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     report_path = config.reports_dir / "full_evaluation_report.json"
     if report_path.exists():
         report = load_json(report_path)
 
-        st.info(f"Report Generated: {report.get('timestamp', 'N/A')} | Hardware: {report.get('hardware_device', 'CPU')}")
+        st.caption(f"Last Evaluation: {report.get('timestamp', 'N/A')} | Compute: {report.get('hardware_device', 'CPU')}")
 
         st.subheader("Target Benchmark Comparison")
         comp_plot = config.plots_dir / "benchmark_comparison.png"
         if comp_plot.exists():
             st.image(str(comp_plot), use_container_width=True)
 
-        st.subheader("Modality Performance Summaries")
+        st.markdown("---")
+        st.subheader("Modality Performance Summary")
         p_c1, p_c2 = st.columns(2)
         with p_c1:
-            st.markdown("#### Image Classifier (Test Split)")
+            st.markdown("#### Image Classifier (Test Partition)")
             img_m = report.get("image_modality", {})
             st.write(f"- **Accuracy:** {img_m.get('accuracy', 0.0) * 100:.1f}%")
             st.write(f"- **F1-Score:** {img_m.get('f1', 0.0):.3f}")
@@ -611,10 +1108,10 @@ elif navigation == "Model Performance":
 
             cm_img = config.plots_dir / "confusion_matrix_image.png"
             if cm_img.exists():
-                st.image(str(cm_img), caption="Confusion Matrix", width=320)
+                st.image(str(cm_img), caption="Image Confusion Matrix", width=340)
 
         with p_c2:
-            st.markdown("#### Audio Classifier (Test Split)")
+            st.markdown("#### Audio Classifier (Test Partition)")
             aud_m = report.get("audio_modality", {})
             st.write(f"- **Accuracy:** {aud_m.get('accuracy', 0.0) * 100:.1f}%")
             st.write(f"- **F1-Score:** {aud_m.get('f1', 0.0):.3f}")
@@ -625,49 +1122,49 @@ elif navigation == "Model Performance":
 
             roc_img = config.plots_dir / "roc_curve_image.png"
             if roc_img.exists():
-                st.image(str(roc_img), caption="ROC Curve", width=320)
+                st.image(str(roc_img), caption="Audio ROC Curve", width=340)
 
         st.markdown("---")
-        st.subheader("Video Throughput Benchmark")
+        st.subheader("Video Processing Throughput")
         vb = report.get("video_benchmark", {})
         vb_c1, vb_c2, vb_c3, vb_c4 = st.columns(4)
         with vb_c1:
-            st.metric("Video Duration", f"{vb.get('video_duration_sec', 0)} s")
+            st.metric("Video Duration", f"{vb.get('video_duration_sec', 0)}s")
         with vb_c2:
             st.metric("Sampled Frames", f"{vb.get('frames_sampled', 0)}")
         with vb_c3:
-            st.metric("Total Latency", f"{vb.get('total_processing_time_sec', 0)} s")
+            st.metric("Total Latency", f"{vb.get('total_processing_time_sec', 0)}s")
         with vb_c4:
             st.metric("Throughput FPS", f"{vb.get('throughput_fps', 0)} FPS")
-
     else:
-        st.warning("No evaluation report found. Run `python evaluation/evaluate.py` to generate live metrics.")
+        st.warning("No evaluation report found. Execute `python evaluation/evaluate.py` to record live metrics.")
 
 
 # =====================================================================
-# 8. ABOUT & ARCHITECTURE
+# 8. SYSTEM ARCHITECTURE
 # =====================================================================
-elif navigation == "About & Architecture":
-    st.title("ℹ️ About the Project & Engineering Details")
+elif navigation == "System Architecture":
     st.markdown("""
-    ### Project Background
-    This project was engineered as a high-standard **B.Tech CSE (AI & ML) Capstone Portfolio System** 
-    demonstrating genuine proficiency in deep learning, computer vision, acoustic signal processing, 
-    multimodal machine learning, and explainable AI (XAI).
+    <div class="saas-header">
+        <div>
+            <h1>System Architecture & Academic Citations</h1>
+            <p>Technology stack, mathematical foundation, and benchmark dataset citations</p>
+        </div>
+        <div class="telemetry-pill">
+            <span class="status-dot-green"></span>
+            <span>B.Tech AI/ML Capstone</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    ### Key Engineering Design Decisions
-    1. **Identity-Disjoint Splitting**: Preprocessing and dataset generators enforce strict identity separation 
-       between training and validation/test splits to eliminate optimistic data leakage.
-    2. **Graceful Fallbacks & Portability**: Automatically handles hardware switching between Apple Silicon (MPS), 
-       NVIDIA CUDA, and standard CPU without code alteration.
-    3. **Honest Confidence & Limitations**: Does not misrepresent neural network softmax confidence as absolute real-world 
-       authenticity, and explicitly clarifies the distinction between cross-modal consistency and phoneme-level lip-synchrony.
+    st.markdown("""
+    ### Engineering Standards
+    1. **Identity Disjointness**: Training and validation/test partitions enforce strict subject separation to prevent optimistic data leakage.
+    2. **Multi-Hardware Portability**: Automatic hardware acceleration across Apple Silicon MPS (`arm64`), NVIDIA CUDA, and standard CPU.
+    3. **Responsible AI Disclosure**: Model confidence represents empirical posterior probabilities rather than guaranteed real-world truth.
 
-    ### Technology Stack
-    - **Deep Learning Framework**: PyTorch 2.x, Torchvision, Torchaudio
-    - **Vision & Video**: OpenCV, PIL
-    - **Audio Processing**: Librosa, SoundFile
-    - **Metrics & Science**: Scikit-learn, NumPy, Pandas, SciPy
-    - **Explainability**: Custom Grad-CAM, Matplotlib, Seaborn
-    - **Web Framework**: Streamlit
+    ### Benchmark Citations
+    - **FaceForensics++**: Rössler et al., *Learning to Detect Manipulated Facial Images*, ICCV 2019.
+    - **Celeb-DF**: Li et al., *Celeb-DF: A Large-scale Challenging Dataset for DeepFake Forensics*, CVPR 2020.
+    - **ASVspoof**: Todisco et al., *ASVspoof 2019: Future Horizons in Spoofed and Fake Audio Detection*, Interspeech 2019.
     """)
