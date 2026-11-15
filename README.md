@@ -166,7 +166,7 @@ python data/download_datasets.py --guide faceforensics
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/multimodal-deepfake-detection.git
+   git clone https://github.com/shrutiyadav2005/multimodal-deepfake-detection.git
    cd multimodal-deepfake-detection
    ```
 
