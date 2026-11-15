@@ -38,13 +38,24 @@ class VideoDeepfakeDetector(nn.Module):
         Inference over extracted video frames.
 
         Args:
-            frames_tensor: Tensor of shape (N, 3, H, W) where N is number of sampled frames.
+            frames_tensor: Tensor of shape (N, 3, H, W) or (1, N, 3, H, W) where N is number of sampled frames.
 
         Returns:
             Dict containing video-level verdict, confidence, per-frame scores, and suspicious indices.
         """
         # Ensure evaluation mode
         self.image_model.eval()
+
+        # Handle 5D tensor input: (1, N, 3, H, W) -> (N, 3, H, W)
+        if frames_tensor.dim() == 5 and frames_tensor.size(0) == 1:
+            frames_tensor = frames_tensor.squeeze(0)
+
+        # Ensure frames tensor matches model device
+        try:
+            device = next(self.image_model.parameters()).device
+            frames_tensor = frames_tensor.to(device)
+        except StopIteration:
+            pass
 
         with torch.no_grad():
             logits = self.image_model(frames_tensor)

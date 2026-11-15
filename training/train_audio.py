@@ -84,14 +84,27 @@ def train_audio_model(
     if len(train_dataset) == 0:
         raise ValueError(f"No audio samples found in {train_dir}. Please run dataset generation first.")
 
+    # Calculate class weights to handle imbalance
+    labels = [s[1] for s in train_dataset.samples]
+    num_real = labels.count(0)
+    num_fake = labels.count(1)
+    print(f"[*] Audio Class Distribution: Real={num_real}, Fake={num_fake}")
+
+    weights = torch.tensor([
+        1.0 / max(num_real, 1),
+        1.0 / max(num_fake, 1)
+    ], dtype=torch.float).to(device)
+    weights = weights / weights.sum()
+
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False) if len(val_dataset) > 0 else None
 
     model = AudioDeepfakeDetector()
     model.to(device)
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=weights)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
     history = {
         "train_loss": [],
@@ -122,6 +135,7 @@ def train_audio_model(
             correct += (preds == targets).sum().item()
             total += targets.size(0)
 
+        scheduler.step()
         train_loss = running_loss / total
         train_acc = correct / total
         history["train_loss"].append(round(train_loss, 4))

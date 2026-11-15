@@ -65,6 +65,21 @@ class ImageDeepfakeDetector(nn.Module):
                 nn.Linear(512, self.num_classes)
             )
             self.target_layer = self.backbone.layer4[-1]
+        elif architecture == "efficientnet_b0":
+            try:
+                weights = models.EfficientNet_B0_Weights.DEFAULT if pretrained_backbone else None
+                self.backbone = models.efficientnet_b0(weights=weights)
+            except Exception:
+                self.backbone = models.efficientnet_b0(weights=None)
+            in_features = self.backbone.classifier[1].in_features
+            self.backbone.classifier = nn.Sequential(
+                nn.Dropout(p=dropout_rate),
+                nn.Linear(in_features, 256),
+                nn.ReLU(inplace=True),
+                nn.Dropout(p=dropout_rate * 0.7),
+                nn.Linear(256, self.num_classes)
+            )
+            self.target_layer = self.backbone.features[-1]
         else:
             raise ValueError(f"Unsupported architecture: {architecture}")
 

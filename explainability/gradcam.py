@@ -53,6 +53,13 @@ class GradCAM:
         self.model.eval()
         self.model.zero_grad()
 
+        # Ensure tensor matches model device
+        try:
+            device = next(self.model.parameters()).device
+            input_tensor = input_tensor.to(device)
+        except StopIteration:
+            pass
+
         # Forward pass (enable gradient computation for CAM)
         input_tensor = input_tensor.clone().requires_grad_(True)
         logits = self.model(input_tensor)

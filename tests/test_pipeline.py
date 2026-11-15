@@ -139,6 +139,15 @@ def test_image_model_forward():
     assert torch.allclose(torch.sum(probs, dim=1), torch.ones(2), atol=1e-5)
 
 
+def test_image_model_efficientnet():
+    model = ImageDeepfakeDetector(architecture="efficientnet_b0", pretrained_backbone=False)
+    x = torch.randn(2, 3, 224, 224)
+    out = model(x)
+    assert out.shape == (2, 2)
+    probs = model.predict_proba(x)
+    assert probs.shape == (2, 2)
+
+
 def test_gradcam_generation():
     model = ImageDeepfakeDetector(architecture="resnet18", pretrained_backbone=False)
     target_layer = model.get_target_layer_for_cam()
@@ -158,12 +167,18 @@ def test_video_model_aggregation():
     img_model = ImageDeepfakeDetector(architecture="resnet18", pretrained_backbone=False)
     vid_model = VideoDeepfakeDetector(image_model=img_model, aggregation_method="top_k_mean")
 
+    # Test 4D input: (N, 3, H, W)
     x = torch.randn(10, 3, 224, 224)
     res = vid_model(x)
     assert "label" in res
     assert "fake_probability" in res
     assert 0.0 <= res["fake_probability"] <= 1.0
     assert len(res["frame_probabilities"]) == 10
+
+    # Test 5D input: (1, N, 3, H, W)
+    x_5d = torch.randn(1, 8, 3, 224, 224)
+    res_5d = vid_model(x_5d)
+    assert len(res_5d["frame_probabilities"]) == 8
 
 
 def test_audio_model_forward():

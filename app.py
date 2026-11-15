@@ -225,30 +225,33 @@ elif navigation == "Image Verification":
     pipeline = get_image_pipeline()
     sample_img_dir = config.sample_data_dir / "images"
 
+    if "target_image_path" not in st.session_state:
+        st.session_state.target_image_path = None
+
     col_btn1, col_btn2 = st.columns(2)
-    selected_sample = None
     with col_btn1:
         if st.button("📁 Load Sample Authentic Image"):
-            selected_sample = sample_img_dir / "sample_real.jpg"
+            st.session_state.target_image_path = sample_img_dir / "sample_real.jpg"
     with col_btn2:
         if st.button("⚠️ Load Sample Manipulated Image"):
-            selected_sample = sample_img_dir / "sample_fake.jpg"
+            st.session_state.target_image_path = sample_img_dir / "sample_fake.jpg"
 
     uploaded_file = st.file_uploader(
         "Choose an image file (.jpg, .jpeg, .png)",
         type=["jpg", "jpeg", "png"]
     )
 
-    target_image_path = None
     if uploaded_file is not None:
         temp_path = config.outputs_dir / f"upload_{uploaded_file.name}"
         with open(temp_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        target_image_path = temp_path
-    elif selected_sample and selected_sample.exists():
-        target_image_path = selected_sample
+        st.session_state.target_image_path = temp_path
 
-    if target_image_path:
+    target_image_path = st.session_state.target_image_path
+
+    if target_image_path and Path(target_image_path).exists():
+        st.markdown(f"**Selected Media:** `{Path(target_image_path).name}`")
+        st.image(str(target_image_path), width=280)
         st.markdown("---")
         crop_face = st.checkbox("Enable Automatic Facial Landmark Cropping", value=True)
 
@@ -304,30 +307,32 @@ elif navigation == "Video Verification":
     pipeline = get_video_pipeline()
     sample_vid_dir = config.sample_data_dir / "videos"
 
+    if "target_video_path" not in st.session_state:
+        st.session_state.target_video_path = None
+
     col_btn1, col_btn2 = st.columns(2)
-    selected_sample = None
     with col_btn1:
         if st.button("📁 Load Sample Authentic Video"):
-            selected_sample = sample_vid_dir / "sample_real.mp4"
+            st.session_state.target_video_path = sample_vid_dir / "sample_real.mp4"
     with col_btn2:
         if st.button("⚠️ Load Sample Manipulated Video"):
-            selected_sample = sample_vid_dir / "sample_fake.mp4"
+            st.session_state.target_video_path = sample_vid_dir / "sample_fake.mp4"
 
     uploaded_video = st.file_uploader(
         "Choose a video file (.mp4, .mov, .avi)",
         type=["mp4", "mov", "avi"]
     )
 
-    target_video_path = None
     if uploaded_video is not None:
         temp_path = config.outputs_dir / f"upload_{uploaded_video.name}"
         with open(temp_path, "wb") as f:
             f.write(uploaded_video.getbuffer())
-        target_video_path = temp_path
-    elif selected_sample and selected_sample.exists():
-        target_video_path = selected_sample
+        st.session_state.target_video_path = temp_path
 
-    if target_video_path:
+    target_video_path = st.session_state.target_video_path
+
+    if target_video_path and Path(target_video_path).exists():
+        st.markdown(f"**Selected Media:** `{Path(target_video_path).name}`")
         st.video(str(target_video_path))
         st.markdown("---")
         col_opt1, col_opt2 = st.columns(2)
@@ -390,30 +395,32 @@ elif navigation == "Audio Verification":
     pipeline = get_audio_pipeline()
     sample_aud_dir = config.sample_data_dir / "audio"
 
+    if "target_audio_path" not in st.session_state:
+        st.session_state.target_audio_path = None
+
     col_btn1, col_btn2 = st.columns(2)
-    selected_sample = None
     with col_btn1:
         if st.button("📁 Load Sample Authentic Audio"):
-            selected_sample = sample_aud_dir / "sample_real.wav"
+            st.session_state.target_audio_path = sample_aud_dir / "sample_real.wav"
     with col_btn2:
         if st.button("⚠️ Load Sample Synthetic Audio"):
-            selected_sample = sample_aud_dir / "sample_fake.wav"
+            st.session_state.target_audio_path = sample_aud_dir / "sample_fake.wav"
 
     uploaded_audio = st.file_uploader(
         "Choose an audio file (.wav, .mp3, .flac)",
         type=["wav", "mp3", "flac"]
     )
 
-    target_audio_path = None
     if uploaded_audio is not None:
         temp_path = config.outputs_dir / f"upload_{uploaded_audio.name}"
         with open(temp_path, "wb") as f:
             f.write(uploaded_audio.getbuffer())
-        target_audio_path = temp_path
-    elif selected_sample and selected_sample.exists():
-        target_audio_path = selected_sample
+        st.session_state.target_audio_path = temp_path
 
-    if target_audio_path:
+    target_audio_path = st.session_state.target_audio_path
+
+    if target_audio_path and Path(target_audio_path).exists():
+        st.markdown(f"**Selected Media:** `{Path(target_audio_path).name}`")
         st.audio(str(target_audio_path))
         st.markdown("---")
 
@@ -460,6 +467,18 @@ elif navigation == "Audio-Visual Consistency":
     vid_pipeline = get_video_pipeline()
     aud_pipeline = get_audio_pipeline()
     verifier = get_multimodal_verifier()
+    sample_vid_dir = config.sample_data_dir / "videos"
+
+    if "target_av_path" not in st.session_state:
+        st.session_state.target_av_path = None
+
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        if st.button("📁 Load Authentic Video Sample", key="av_real"):
+            st.session_state.target_av_path = sample_vid_dir / "sample_real.mp4"
+    with col_btn2:
+        if st.button("⚠️ Load Manipulated Video Sample", key="av_fake"):
+            st.session_state.target_av_path = sample_vid_dir / "sample_fake.mp4"
 
     uploaded_av = st.file_uploader(
         "Choose a video file (.mp4, .mov, .avi) with an audio track",
@@ -470,18 +489,23 @@ elif navigation == "Audio-Visual Consistency":
         temp_video = config.outputs_dir / f"av_{uploaded_av.name}"
         with open(temp_video, "wb") as f:
             f.write(uploaded_av.getbuffer())
+        st.session_state.target_av_path = temp_video
 
-        st.video(str(temp_video))
+    target_av_path = st.session_state.target_av_path
+
+    if target_av_path and Path(target_av_path).exists():
+        st.markdown(f"**Selected Media:** `{Path(target_av_path).name}`")
+        st.video(str(target_av_path))
 
         if st.button("🚀 Analyze Cross-Modal Consistency", type="primary"):
             with st.spinner("Extracting visual frames, extracting audio track, and evaluating congruence..."):
                 # 1. Video analysis
-                vid_res = vid_pipeline.analyze(temp_video)
+                vid_res = vid_pipeline.analyze(target_av_path)
 
                 # 2. Extract audio and analyze
-                temp_wav = config.outputs_dir / f"extracted_{Path(temp_video).stem}.wav"
+                temp_wav = config.outputs_dir / f"extracted_{Path(target_av_path).stem}.wav"
                 try:
-                    aud_pipeline.preprocessor.extract_audio_from_video(temp_video, temp_wav)
+                    aud_pipeline.preprocessor.extract_audio_from_video(target_av_path, temp_wav)
                     aud_res = aud_pipeline.analyze(temp_wav)
                     audio_available = True
                 except Exception as e:
